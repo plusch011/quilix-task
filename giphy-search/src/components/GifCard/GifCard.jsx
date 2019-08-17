@@ -1,12 +1,11 @@
 import React from 'react';
-import constants from '../../constants';
 import './gifCard.scss';
 
 
-export default function GifCard({ data, id }) {
+export default function GifCard({ data, id, gifWidth }) {
 
   const culcHeight = (width, height) => {
-    const dif = constants.gifWidth / width;
+    const dif = gifWidth / width;
   
     return height * dif;
   }
@@ -18,7 +17,7 @@ export default function GifCard({ data, id }) {
       className="card-gif"
       data-id={ id }
       height={ culcHeight(data.width, data.height) }
-      width={ constants.gifWidth }
+      width={ gifWidth }
     />
   );
 }

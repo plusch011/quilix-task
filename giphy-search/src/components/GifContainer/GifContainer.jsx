@@ -9,8 +9,6 @@ import Masonry from 'react-masonry-component';
 import './GifContainer.scss';
 
 
-
-
 export default class GifContainer extends React.PureComponent {
 
   state = {
@@ -22,7 +20,6 @@ export default class GifContainer extends React.PureComponent {
   constructor(props) {
     super(props);
     this.giphyOffset = 0;
-    this.gifLimit = 40;
   }
 
   componentDidMount() {
@@ -35,14 +32,23 @@ export default class GifContainer extends React.PureComponent {
   }
 
   getData = async (request) => {
-    console.log("get data");
     const { isContentOver } = this.state;
-    const { isGettingData, toggleGettingData } = this.props;
+    const { isGettingData, toggleGettingData, maxCount, ratingValue } = this.props;
     let data; 
 
     if(isGettingData || isContentOver ) return;
 
-    const url = `${ constants.giphyDomain }.${request}&api_key=${ constants.APIKey }&limit=${ constants.dataChunkSize }&offset=${ this.giphyOffset }`;
+    const x = maxCount - this.giphyOffset;
+
+    if(x <= 0){
+      this.setState({ isContentOver: true });
+      return;
+    }
+
+    const chunkSize = Math.min(constants.dataChunkSize, x);
+
+
+    const url = `${ constants.giphyDomain }.${request}&api_key=${ constants.APIKey }&limit=${ chunkSize }&offset=${ this.giphyOffset }&rating=${ratingValue}`;
 
     toggleGettingData();
 
@@ -50,10 +56,7 @@ export default class GifContainer extends React.PureComponent {
     
     toggleGettingData();
 
-    this.giphyOffset += constants.dataChunkSize;
-    this.gifLimit = data.pagination.total_count;
-
-    if(this.giphyOffset >= this.gifLimit ) this.setState({ isContentOver: true });
+    this.giphyOffset += chunkSize;
 
     return data;
   }
@@ -102,6 +105,7 @@ export default class GifContainer extends React.PureComponent {
 
   render() {
     const { modalInfo, searchData, isContentOver } = this.state;
+    const { gifWidth } = this.props;
 
     return (
       <div
@@ -119,7 +123,10 @@ export default class GifContainer extends React.PureComponent {
         >   
           {searchData.map((data, i) =>  
               <li key={key(data)} >
-                <GifCard data={this.extractData(data)} id={i} />
+                <GifCard
+                  gifWidth={gifWidth}
+                  data={this.extractData(data)} 
+                  id={i} />
               </li> )
           }
         </Masonry>

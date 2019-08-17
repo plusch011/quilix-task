@@ -3,15 +3,24 @@ import GifContainer from '../GifContainer';
 import './Main.scss';
 
 
-export default function Main(props) {
+export default function Main({
+    searchRequest,
+    isGettingData, 
+    toggleGettingData,
+    gifWidth,
+    maxCount,
+    ratingValue,
+}) {
     return (
         <main>
             <GifContainer
-                searchRequest={props.searchRequest}
-                isGettingData={props.isGettingData}
-                toggleGettingData={props.toggleGettingData}
-                chunkSize={props.chunkSize}
-                key={props.searchRequest}
+                searchRequest={searchRequest}
+                isGettingData={isGettingData}
+                toggleGettingData={toggleGettingData}
+                gifWidth={gifWidth}
+                maxCount={maxCount}
+                ratingValue={ratingValue}
+                key={searchRequest + ratingValue + maxCount}
             />
         </main>
     );
