@@ -1,0 +1,65 @@
+  
+  
+  .search-container {
+    position: relative;
+
+    input {
+      outline: none;
+      background: transparent;
+      box-sizing: border-box;
+      width: 400px;
+      height: 42px;
+      padding-left: 15px;
+      border: 3px solid #F9F0DA;
+      color: #F9F0DA;
+      font-size: 20px;
+    }
+  
+    input:focus {
+      border-color: #311c24;
+    }
+
+    .lds-dual-ring {
+      position: absolute;
+      right: -30px;
+      top: 7px;
+    }
+  }
+
+
+
+@media screen and (max-width: 828px){
+    .search-container {
+      input {
+        width: 500px;
+        height: 52px;
+      }
+      
+      .lds-dual-ring {
+        right: -25px;
+        top: 12px;
+      }
+    }
+  
+}
+
+@media screen and (max-width: 624px){
+ 
+    .search-container {
+      input {
+        width: 320px;
+      }
+    }
+  
+}
+
+
+@media screen and (max-width: 420px){
+
+    .search-container {
+      input {
+        width: 70vw;
+      }
+    }
+  
+}
