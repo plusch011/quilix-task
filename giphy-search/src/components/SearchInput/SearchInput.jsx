@@ -2,6 +2,7 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import Options from '../Options'
 import Loader from '../Loader';
+// import OptionsDrawer from '../OptionsDrawer';
 import './searchInput.scss';
 
 
@@ -82,13 +83,13 @@ export default class SearchInput extends React.Component {
                     />
                     {isGettingData && <Loader />}
                 </div>
-
-                <Options 
+                <Options
                     ratingValue={ratingValue}
                     handleGifWidthChange={handleGifWidthChange}
                     handleMaxCountChange={handleMaxCountChange}
                     handleRatingValueChange={handleRatingValueChange}
                 />
+
             </div>
 
         );

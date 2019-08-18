@@ -23,7 +23,7 @@ export default function GifModalWindow({ open, onClose, modalInfo }) {
       height: 200,
     },
   });
-  
+
   const classes = useStyles();
 
   return (
@@ -32,32 +32,32 @@ export default function GifModalWindow({ open, onClose, modalInfo }) {
         className='modal'
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
-        open={ open }
-        onClose={ onClose }
+        open={open}
+        onClose={onClose}
       >
         <Card className={classes.card}>
           <CardMedia
             className={classes.media}
-            image={ modalInfo.images.fixed_width_still.url }
+            image={modalInfo.images.fixed_width_still.url}
             title="Contemplative Reptile"
           />
           <CardContent>
             <Typography gutterBottom variant="h5" component="h2">
-              { modalInfo.title }
+              {modalInfo.title}
             </Typography>
             <Typography variant="body2" color="textSecondary" component="span">
-              Rating: { modalInfo.rating }
+              Rating: {modalInfo.rating}
               <br />
-              Import date: { modalInfo.import_datetime }
+              Import date: {modalInfo.import_datetime}
             </Typography>
           </CardContent>
           <CardActions>
-          <Link
-            href={ modalInfo.source }
-            target="_blank"
-            rel="noreferrer"
-          >
-            Source link
+            <Link
+              href={modalInfo.source}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Source link
           </Link>
           </CardActions>
         </Card>

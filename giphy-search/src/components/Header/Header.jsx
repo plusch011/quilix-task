@@ -1,5 +1,6 @@
 import React from 'react';
 import { GoogleLogin, GoogleLogout } from 'react-google-login'
+import Button from "@material-ui/core/Button";
 import SearchInput from '../SearchInput';
 import constants from '../../constants'
 import './Header.scss';
@@ -14,7 +15,7 @@ export default class Header extends React.Component {
 
     handleLogIn = responce => {
         console.log(responce);
-        this.setState({ isLoggedIn: true });
+        this.setState({ isLoggedIn: true, userData: responce });
     }
 
     handleLogOut = () => {
@@ -35,7 +36,7 @@ export default class Header extends React.Component {
 
         return (
             <header>
-                <h1>Quilix Giphy search</h1>
+                <h1>QUILIX GIPHY</h1>
 
                 <SearchInput
                     isGettingData={isGettingData}
@@ -47,9 +48,20 @@ export default class Header extends React.Component {
                     userData={userData}
                 />
 
+
                 {!isLoggedIn &&
                     <GoogleLogin
                         clientId={constants.googleClientId}
+                        render={renderProps => (
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                onClick={renderProps.onClick}
+                                disabled={renderProps.disabled}
+                                className='google-login'
+                            >Google Login
+                            </Button>
+                        )}
                         buttonText="Login"
                         onSuccess={this.handleLogIn}
                         cookiePolicy={'single_host_origin'}
@@ -59,6 +71,16 @@ export default class Header extends React.Component {
                 {isLoggedIn &&
                     <GoogleLogout
                         clientId={constants.googleClientId}
+                        render={renderProps => (
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                onClick={renderProps.onClick}
+                                disabled={renderProps.disabled}
+                                className='google-logout'
+                            >Logout
+                            </Button>
+                        )}
                         buttonText="Logout"
                         onLogoutSuccess={this.handleLogOut}
                     ></GoogleLogout>
