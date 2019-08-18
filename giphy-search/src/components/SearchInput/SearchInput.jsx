@@ -1,6 +1,7 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import Options from '../Options'
+import Loader from '../Loader';
 import './searchInput.scss';
 
 
@@ -69,14 +70,19 @@ export default class SearchInput extends React.Component {
 
         return (
             <div className='search-container'>
-                <Autosuggest
-                    suggestions={ suggestions }
-                    onSuggestionsFetchRequested={ this.onSuggestionsFetchRequested }
-                    onSuggestionsClearRequested={ () => this.setState({ suggestions: [] })}
-                    getSuggestionValue={ suggestion => suggestion.value }
-                    renderSuggestion={ suggestion => <span>{ suggestion.value }</span> }
-                    inputProps={ inputProps }
-                />
+                <div className='search-input'>
+                    <Autosuggest
+                        suggestions={ suggestions }
+                        onSuggestionsFetchRequested={ this.onSuggestionsFetchRequested }
+                        onSuggestionsClearRequested={ () => this.setState({ suggestions: [] })}
+                        getSuggestionValue={ suggestion => suggestion.value }
+                        renderSuggestion={ suggestion => <span>{ suggestion.value }</span> }
+                        inputProps={ inputProps }
+                        isGettingData={isGettingData}
+                    />
+                    {isGettingData && <Loader />}
+                </div>
+
                 <Options 
                     ratingValue={ratingValue}
                     handleGifWidthChange={handleGifWidthChange}

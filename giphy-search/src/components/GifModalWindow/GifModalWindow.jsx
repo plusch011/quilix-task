@@ -27,7 +27,7 @@ export default function GifModalWindow({ open, onClose, modalInfo }) {
   const classes = useStyles();
 
   return (
-    <div class="modal-container">
+    <div className="modal-container">
       <Modal
         className='modal'
         aria-labelledby="simple-modal-title"

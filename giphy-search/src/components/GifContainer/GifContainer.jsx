@@ -34,25 +34,22 @@ export default class GifContainer extends React.PureComponent {
   getData = async (request) => {
     const { isContentOver } = this.state;
     const { isGettingData, toggleGettingData, maxCount, ratingValue } = this.props;
-    let data; 
 
     if(isGettingData || isContentOver ) return;
 
-    const x = maxCount - this.giphyOffset;
+    const remainGifs = maxCount - this.giphyOffset;
 
-    if(x <= 0){
+    if(remainGifs <= 0){
       this.setState({ isContentOver: true });
       return;
     }
 
-    const chunkSize = Math.min(constants.dataChunkSize, x);
-
-
+    const chunkSize = Math.min(constants.dataChunkSize, remainGifs);
     const url = `${ constants.giphyDomain }.${request}&api_key=${ constants.APIKey }&limit=${ chunkSize }&offset=${ this.giphyOffset }&rating=${ratingValue}`;
 
     toggleGettingData();
 
-    data = await giphyRequest(url);
+    const data = await giphyRequest(url);
     
     toggleGettingData();
 
@@ -86,13 +83,13 @@ export default class GifContainer extends React.PureComponent {
   }
 
   handleScroll = async (event) => {
-    const { searchRequest, isGettingData } = this.props;
+    const { searchRequest } = this.props;
     const { searchData } = this.state;
     const slider = event.target;
     const topOffset = slider.scrollHeight - slider.scrollTop;
     const scrHeight = document.documentElement.clientHeight;
 
-    if (topOffset < scrHeight * 2 && !isGettingData) {
+    if (topOffset < scrHeight) {
       const newData = await this.getData(searchRequest);
       if(!newData) return;
       this.setState({ searchData: searchData.concat(newData.data) });
