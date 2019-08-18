@@ -1,80 +1,54 @@
 import React from 'react';
 import Main from '../Main';
-import Header from '../Header';
+import HeaderUI from '../HeaderUI';
 import './App.scss';
 
 export default class App extends React.Component {
 
     state = {
         searchRequest: '',
-        isGettingData: false,
-        gifWidth: 200,
-        maxCount: 500,
+        maxCount: 400,
         ratingValue: 'G',
     }
 
-    toggleGettingData = () => {
-        const { isGettingData } = this.state;
-        this.setState({ isGettingData: !isGettingData });
-    }
-
-    handleQuerryChange = value => {
-
-        clearTimeout(this.querryTimer);
-
-        this.querryTimer = setTimeout(() => {
-            this.setState({ searchRequest: value });
+    handleChange = (e, timer, prop) => {
+        e.persist();
+        clearTimeout(this[timer]);
+        this[timer] = setTimeout(() => {
+            this.setState({ [prop]: e.target.value });
         }, 400);
 
+    }
+
+    handleQuerryChange = e => {
+        this.handleChange(e, 'querryTimer', 'searchRequest');
     }
 
     handleRatingValueChange = e => {
-        e.persist();
-        clearTimeout(this.ratingTimer);
-        this.ratingTimer = setTimeout(() => {
-            this.setState({ ratingValue: e.target.value })
-        }, 400);
+        this.handleChange(e, 'ratingTimer', 'ratingValue');
     }
 
     handleMaxCountChange = e => {
-        e.persist();
-        console.log('width changes')
-        clearTimeout(this.countTimer);
-        this.countTimer = setTimeout(() => {
-            this.setState({ maxCount: e.target.value })
-        }, 400);
-    }
-
-    handleGifWidthChange = e => {
-        e.persist();
-        console.log('width changes')
-        clearTimeout(this.gifWidthTimer);
-        this.gifWidthTimer = setTimeout(() => {
-            this.setState({ gifWidth: e.target.value })
-        }, 400);
+        this.handleChange(e, 'maxCountTimer', 'maxCount');
     }
 
     render() {
-        const { searchRequest, isGettingData, gifWidth, maxCount, ratingValue } = this.state;
+        const { searchRequest, maxCount, ratingValue } = this.state;
 
         return (
             <>
-                <Header
-                    inputValue={searchRequest}
-                    isGettingData={isGettingData}
+                <HeaderUI 
+                    maxCount={maxCount}
                     ratingValue={ratingValue}
                     handleQuerryChange={this.handleQuerryChange}
-                    handleGifWidthChange={this.handleGifWidthChange}
                     handleMaxCountChange={this.handleMaxCountChange}
                     handleRatingValueChange={this.handleRatingValueChange}
                 />
+
                 <Main
                     searchRequest={searchRequest}
-                    isGettingData={isGettingData}
-                    gifWidth={gifWidth}
                     maxCount={maxCount}
                     ratingValue={ratingValue}
-                    toggleGettingData={this.toggleGettingData}
                 />
             </>
         );

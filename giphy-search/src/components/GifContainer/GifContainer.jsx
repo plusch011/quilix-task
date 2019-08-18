@@ -6,70 +6,79 @@ import giphyRequest from '../../http/giphyRequest';
 import constants from '../../constants';
 import key from 'weak-key';
 import Masonry from 'react-masonry-component';
+import Loader from '../Loader';
 import './GifContainer.scss';
 
 
-export default class GifContainer extends React.PureComponent {
+export default class GifContainer extends React.Component {
 
   state = {
     searchData: [],
     modalInfo: null,
-    isContentOver: false,
+    isGettingData: false,
   }
-  
+
   constructor(props) {
     super(props);
     this.giphyOffset = 0;
   }
 
   componentDidMount() {
-    const { searchRequest, isGettingData } = this.props;
+    const { searchRequest } = this.props;
 
-    if(searchRequest && !isGettingData){
+    if (searchRequest) {
       this.getData(searchRequest)
-          .then(data => this.setState({ searchData: data.data}));
+        .then(data => this.setState({ searchData: data }));
+    }
+  }
+
+  toggleGettingData = () => {
+    const { isGettingData } = this.state;
+    if (isGettingData) {
+      setTimeout(() => {
+        this.setState({ isGettingData: !isGettingData })
+      }, 700);
+    } else {
+      this.setState({ isGettingData: !isGettingData });
     }
   }
 
   getData = async (request) => {
-    const { isContentOver } = this.state;
-    const { isGettingData, toggleGettingData, maxCount, ratingValue } = this.props;
+    const { isGettingData } = this.state;
+    const { maxCount, ratingValue } = this.props;
 
-    if(isGettingData || isContentOver ) return;
+    if (isGettingData) return;
 
     const remainGifs = maxCount - this.giphyOffset;
 
-    if(remainGifs <= 0){
-      this.setState({ isContentOver: true });
-      return;
-    }
-
     const chunkSize = Math.min(constants.dataChunkSize, remainGifs);
-    const url = `${ constants.giphyDomain }.${request}&api_key=${ constants.APIKey }&limit=${ chunkSize }&offset=${ this.giphyOffset }&rating=${ratingValue}`;
+    const url = `${constants.giphyDomain}.${request}&api_key=${constants.APIKey}&limit=${chunkSize}&offset=${this.giphyOffset}&rating=${ratingValue}`;
 
-    toggleGettingData();
+    this.toggleGettingData();
 
-    const data = await giphyRequest(url);
-    
-    toggleGettingData();
+    const data = await giphyRequest(url).catch( err => { console.log`Sorry we have problems ${err}`});
+
+    this.toggleGettingData();
 
     this.giphyOffset += chunkSize;
 
-    return data;
+    return this.extractData(data.data);
   }
 
   extractData(data) {
-    const { title, images, import_datetime, source, images: {preview_gif: { width, height }}, rating } = data;
+    return data.map(obj => {
+      const { title, images, import_datetime, source, images: { preview_gif: { width, height } }, rating } = obj;
 
-    return {
-      height,
-      width,
-      title,
-      images,
-      import_datetime,
-      source,
-      rating,
-    }
+      return {
+        height,
+        width,
+        title,
+        images,
+        import_datetime,
+        source,
+        rating,
+      }
+    });
   }
 
   handleClick = (event) => {
@@ -78,21 +87,21 @@ export default class GifContainer extends React.PureComponent {
 
 
     if (gifId) {
-      this.setState({ modalInfo: searchData[ gifId ] });
+      this.setState({ modalInfo: searchData[gifId] });
     }
   }
 
   handleScroll = async (event) => {
+    event.persist();
     const { searchRequest } = this.props;
     const { searchData } = this.state;
     const slider = event.target;
-    const topOffset = slider.scrollHeight - slider.scrollTop;
     const scrHeight = document.documentElement.clientHeight;
 
-    if (topOffset < scrHeight) {
+    if (slider.scrollHeight <= slider.scrollTop + scrHeight) {
       const newData = await this.getData(searchRequest);
-      if(!newData) return;
-      this.setState({ searchData: searchData.concat(newData.data) });
+      if (!newData) return;
+      this.setState({ searchData: [...searchData, ...newData] });
     }
   }
 
@@ -101,43 +110,40 @@ export default class GifContainer extends React.PureComponent {
   }
 
   render() {
-    const { modalInfo, searchData, isContentOver } = this.state;
-    const { gifWidth } = this.props;
+    const { modalInfo, searchData, isContentOver, isGettingData } = this.state;
 
     return (
-      <div
-        className="gif-container"
-        onClick={ this.handleClick }
-        onScroll={ this.handleScroll }
-      >
-        <Masonry
-          className={'my-gallery-class'}
-          elementType={'ul'}
-          options={{ transitionDuration: 1 }}
-          disableImagesLoaded={false}
-          updateOnEachImageLoad={false}
-          imagesLoadedOptions={ { display: 'none' } }
-        >   
-          {searchData.map((data, i) =>  
+      <>
+        {isGettingData && <Loader />}
+        <div
+          className="gif-container"
+          onClick={this.handleClick}
+          onScroll={this.handleScroll}
+        >
+          <Masonry
+            className={'my-gallery-class'}
+            elementType={'ul'}
+            options={{ transitionDuration: 0 }}
+            disableImagesLoaded={false}
+            updateOnEachImageLoad={true}
+            imagesLoadedOptions={{ display: 'none' }}
+          >
+            {searchData.map((data, i) =>
               <li key={key(data)} >
-                <GifCard
-                  gifWidth={gifWidth}
-                  data={this.extractData(data)} 
-                  id={i} />
-              </li> )
-          }
-        </Masonry>
-    
-        { isContentOver && <NoMoreGifs />}
+                <GifCard data={data} id={i} />
+              </li>)
+            }
+          </Masonry>
 
-        { !!modalInfo &&
-          <GifModalWindow
-            open={ !!modalInfo }
-            onClose={ this.handleModalClose }
-            modalInfo={ this.extractData(modalInfo) }
-          />
-        }
-      </div>
+          {!!modalInfo &&
+            <GifModalWindow
+              open={!!modalInfo}
+              onClose={this.handleModalClose}
+              modalInfo={modalInfo}
+            />
+          }
+        </div>
+      </>
     )
   }
 }
